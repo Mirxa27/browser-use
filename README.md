@@ -200,3 +200,47 @@ If you use Browser Use in your research or project, please cite:
 <div align="center">
 Made with ❤️ in Zurich and San Francisco
  </div>
+
+## Deploying on Netlify by the name of Mirxa
+
+To deploy this project on Netlify by the name of Mirxa, follow these steps:
+
+1. **Create a Netlify account**: If you don't have a Netlify account, sign up at [Netlify](https://www.netlify.com/).
+
+2. **Install Netlify CLI**: Install the Netlify CLI globally on your machine.
+
+   ```bash
+   npm install -g netlify-cli
+   ```
+
+3. **Login to Netlify**: Login to your Netlify account using the CLI.
+
+   ```bash
+   netlify login
+   ```
+
+4. **Initialize a new site**: Initialize a new site in the current directory.
+
+   ```bash
+   netlify init
+   ```
+
+5. **Deploy the site**: Deploy the site to Netlify.
+
+   ```bash
+   netlify deploy --prod
+   ```
+
+### Setting up the `NETLIFY_AUTH_TOKEN` environment variable
+
+To authenticate with Netlify, you need to set up the `NETLIFY_AUTH_TOKEN` environment variable. Follow these steps:
+
+1. **Generate a personal access token**: Go to your Netlify account settings and generate a new personal access token.
+
+2. **Add the token to your environment variables**: Add the generated token to your environment variables.
+
+   ```bash
+   export NETLIFY_AUTH_TOKEN=your_generated_token
+   ```
+
+For more detailed instructions, refer to the [Netlify documentation](https://docs.netlify.com/).
