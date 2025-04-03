@@ -93,3 +93,4 @@ dev-dependencies = [
     "pre-commit>=4.2.0",
     "codespell>=2.4.1",
 ]
+[tool.poetry]\nname = "browser-use"\nversion = "0.1.0"\ndescription = "Enable AI to control your browser"\nauthors = ["Your Name <you@example.com>"]\n\n[tool.poetry.dependencies]\npython = "^3.11"\n\n[tool.poetry.dev-dependencies]\npytest = "^6.2.4"
