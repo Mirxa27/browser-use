@@ -13,6 +13,15 @@ from browser_use.browser.context import BrowserContextConfig
 from browser_use.controller.service import Controller as Controller
 from browser_use.dom.service import DomService as DomService
 
+# Voice control module (optional - requires voice dependencies)
+try:
+	from browser_use.voice import VoiceAgent as VoiceAgent
+	from browser_use.voice import VoiceAgentConfig as VoiceAgentConfig
+
+	_voice_available = True
+except ImportError:
+	_voice_available = False
+
 __all__ = [
 	'Agent',
 	'Browser',
@@ -25,3 +34,7 @@ __all__ = [
 	'AgentHistoryList',
 	'BrowserContextConfig',
 ]
+
+# Add voice exports if available
+if _voice_available:
+	__all__.extend(['VoiceAgent', 'VoiceAgentConfig'])
