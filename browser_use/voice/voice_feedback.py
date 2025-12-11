@@ -44,6 +44,7 @@ class VoiceFeedbackConfig:
 	# Customization
 	acknowledgment_sound: bool = True  # Play a sound for quick acknowledgments
 	max_result_length: int = 500  # Max characters to speak for results
+	truncation_suffix: str = '... and more.'  # Suffix for truncated results
 
 	# Callbacks
 	on_speaking_start: Optional[Callable[[str], None]] = None
@@ -208,7 +209,7 @@ class VoiceFeedback:
 
 		# Truncate long results
 		if feedback_type == FeedbackType.RESULT and len(text) > self.config.max_result_length:
-			text = text[: self.config.max_result_length] + '... and more.'
+			text = text[: self.config.max_result_length] + self.config.truncation_suffix
 
 		logger.debug(f'🔊 Queuing: {text}')
 		self._speech_queue.put((text, feedback_type))

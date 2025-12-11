@@ -85,33 +85,41 @@ def on_listening_change(is_listening: bool):
 		print('🎤 Listening for your command...')
 
 
-async def main():
-	"""Main function to run the voice browser demo."""
-	print_banner()
+def check_dependency(module_name: str, display_name: str, install_cmd: str, required: bool = True) -> bool:
+	"""
+	Check if a dependency is available.
 
-	# Check for API key
-	if not os.environ.get('OPENAI_API_KEY'):
-		print('⚠️  Warning: OPENAI_API_KEY not found in environment.')
-		print('   Please set it in your .env file or environment.')
-		print('   Example: OPENAI_API_KEY=sk-...\n')
+	Args:
+		module_name: The module to import.
+		display_name: Human-readable name for the module.
+		install_cmd: Installation command to display.
+		required: If True, returns False when missing. If False, just warns.
 
+	Returns:
+		True if module is available, False if required and missing.
+	"""
+	try:
+		__import__(module_name)
+		print(f'✓ {display_name} found')
+		return True
+	except ImportError:
+		if required:
+			print(f'❌ {display_name} not found.')
+			print(f'   Install with: {install_cmd}')
+			return False
+		else:
+			print(f'⚠️  {display_name} not found - some features disabled')
+			print(f'   Install with: {install_cmd}')
+			return True
+
+
+def check_dependencies() -> bool:
+	"""Check all required dependencies. Returns True if all required deps are available."""
 	# Check for audio dependencies
-	try:
-		import speech_recognition as sr  # noqa: F401
+	if not check_dependency('speech_recognition', 'SpeechRecognition library', 'pip install SpeechRecognition'):
+		return False
 
-		print('✓ SpeechRecognition library found')
-	except ImportError:
-		print('❌ SpeechRecognition library not found.')
-		print('   Install with: pip install SpeechRecognition')
-		return
-
-	try:
-		import pyttsx3  # noqa: F401
-
-		print('✓ pyttsx3 library found')
-	except ImportError:
-		print('⚠️  pyttsx3 not found - voice feedback disabled')
-		print('   Install with: pip install pyttsx3')
+	check_dependency('pyttsx3', 'pyttsx3', 'pip install pyttsx3', required=False)
 
 	# Check for microphone
 	try:
@@ -123,6 +131,23 @@ async def main():
 	except OSError as e:
 		print(f'❌ Microphone error: {e}')
 		print('   Please ensure a microphone is connected and working.')
+		return False
+
+	return True
+
+
+async def main():
+	"""Main function to run the voice browser demo."""
+	print_banner()
+
+	# Check for API key
+	if not os.environ.get('OPENAI_API_KEY'):
+		print('⚠️  Warning: OPENAI_API_KEY not found in environment.')
+		print('   Please set it in your .env file or environment.')
+		print('   Example: OPENAI_API_KEY=sk-...\n')
+
+	# Check all dependencies
+	if not check_dependencies():
 		return
 
 	print('\n' + '=' * 60)

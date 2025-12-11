@@ -340,9 +340,9 @@ class VoiceAgent:
 			# Run the agent
 			history = await self._current_agent.run(max_steps=self.config.max_steps_per_command)
 
-			# Extract result
+			# Extract result - final_result is a method of AgentHistoryList
 			success = history.is_successful()
-			final_result = history.final_result() if hasattr(history, 'final_result') else ''
+			final_result = history.final_result() or ''
 
 			if success:
 				return True, final_result or 'Task completed'

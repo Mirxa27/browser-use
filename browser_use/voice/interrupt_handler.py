@@ -69,6 +69,9 @@ class InterruptHandler:
 	- Manages command queue
 	- Provides smooth transitions between operations
 	- Supports cancellation and resumption
+
+	Note: Uses threading.Lock for thread-safety since callbacks may come from
+	speech recognition threads, combined with asyncio.Event for async coordination.
 	"""
 
 	def __init__(self, config: Optional[InterruptHandlerConfig] = None):
@@ -83,8 +86,10 @@ class InterruptHandler:
 		self._pending_commands: List[PendingCommand] = []
 		self._current_task: Optional[asyncio.Task] = None
 		self._current_command: Optional[str] = None
+		# Use threading.Lock for thread-safety with speech recognition callbacks
 		self._lock = threading.Lock()
 		self._last_interrupt_time: Optional[float] = None
+		# Use asyncio.Event for async coordination
 		self._interrupt_event = asyncio.Event()
 
 	def _set_state(self, state: InterruptState) -> None:

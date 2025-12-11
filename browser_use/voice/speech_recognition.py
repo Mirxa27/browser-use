@@ -41,6 +41,7 @@ class SpeechRecognizerConfig:
 	energy_threshold: int = 300  # Minimum audio energy to consider for recording
 	dynamic_energy_threshold: bool = True  # Adjust energy threshold dynamically
 	pause_threshold: float = 0.8  # Seconds of silence to consider phrase complete
+	ambient_noise_duration: float = 1.0  # Seconds for ambient noise adjustment
 
 	# Callback settings
 	on_wake_word_detected: Optional[Callable[[], None]] = None
@@ -95,10 +96,10 @@ class SpeechRecognizer:
 			self._recognizer.dynamic_energy_threshold = self.config.dynamic_energy_threshold
 			self._recognizer.pause_threshold = self.config.pause_threshold
 
-			# Adjust for ambient noise initially
+			# Adjust for ambient noise initially using configurable duration
 			with self._microphone as source:
 				logger.info('🎤 Adjusting for ambient noise...')
-				self._recognizer.adjust_for_ambient_noise(source, duration=1)
+				self._recognizer.adjust_for_ambient_noise(source, duration=self.config.ambient_noise_duration)
 				logger.info(f'🎤 Energy threshold set to: {self._recognizer.energy_threshold}')
 
 			logger.info('🎤 Speech recognizer initialized successfully')
