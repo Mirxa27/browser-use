@@ -123,12 +123,12 @@ class TestCommandParser:
 
 	def test_format_command_for_agent_navigate(self):
 		"""Test formatting navigate command for agent."""
-		command = VoiceCommand(
-			command_type=CommandType.NAVIGATE, raw_text='go to google', parameters={'url': 'https://www.google.com'}
-		)
+		test_url = 'https://www.google.com'
+		command = VoiceCommand(command_type=CommandType.NAVIGATE, raw_text='go to google', parameters={'url': test_url})
 		task = self.parser.format_command_for_agent(command)
 		assert 'Navigate to' in task
-		assert 'google.com' in task
+		# Verify the URL is included in the formatted task
+		assert test_url in task
 
 	def test_format_command_for_agent_search(self):
 		"""Test formatting search command for agent."""
