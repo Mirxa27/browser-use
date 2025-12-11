@@ -9,10 +9,19 @@ This example demonstrates how to use the voice-controlled browser agent to contr
 - **Natural Language Commands**: Use natural language to control the browser
 - **Voice Feedback**: Get audio confirmation of your commands
 - **Interrupt Support**: Say "stop" or "cancel" at any time to interrupt
+- **Visual Status Indicator**: Real-time feedback showing listening status
+- **Command Chaining**: Execute multiple commands in sequence
+- **Confirmation for Destructive Actions**: Protect against accidental actions
 
 ## Requirements
 
 Install the required dependencies:
+
+```bash
+pip install browser-use[voice]
+```
+
+Or install dependencies manually:
 
 ```bash
 pip install SpeechRecognition pyttsx3 pyaudio
@@ -28,7 +37,7 @@ pip install pyaudio
 
 ### Linux (Ubuntu/Debian)
 ```bash
-sudo apt-get install python3-pyaudio portaudio19-dev
+sudo apt-get install python3-pyaudio portaudio19-dev espeak
 ```
 
 ### Windows
@@ -47,7 +56,11 @@ OPENAI_API_KEY=sk-your-key-here
 
 3. Run the demo:
 ```bash
+# Basic demo
 python voice_browser_demo.py
+
+# Advanced demo with status indicators
+python advanced_voice_demo.py
 ```
 
 ## Usage
@@ -60,41 +73,67 @@ Start by saying one of the wake words:
 
 ### Supported Commands
 
-#### Navigation
+#### 📍 Navigation
 - "Go to google.com"
 - "Navigate to youtube"
 - "Search for Python tutorials"
-- "Go back"
-- "Go forward"
+- "Go back" / "Go forward"
 - "Refresh"
 
-#### Tab Management
+#### 📑 Tab Management
 - "Open new tab"
 - "Close tab"
 - "Switch to tab 2"
 
-#### Page Interaction
-- "Scroll down"
-- "Scroll up"
+#### 📜 Page Interaction
+- "Scroll down" / "Scroll up"
 - "Click on the search button"
 - "Type hello world"
+- "Zoom in" / "Zoom out"
 
-#### Email (when on email sites)
+#### 📄 Content Extraction
+- "Take screenshot"
+- "Save as PDF"
+- "Read page" / "Summarize this page"
+- "Extract text"
+
+#### 📧 Email
 - "Compose email to john@example.com"
 - "Reply to email"
 - "Send email"
 
-#### Control
-- "Stop" / "Cancel" - Interrupt current action
-- "Help" - Show available commands
+#### 📱 Social Media
+- "Post tweet saying hello world"
+- "Like post"
+- "Share post"
 
-### Chaining Commands
+#### 🛒 Shopping
+- "Add to cart"
+- "Checkout"
+- "Buy now"
+
+#### 🎤 Control
+- "Stop" / "Cancel" - Interrupt current action
+- "Wait 5 seconds" - Pause
+- "Undo" - Undo last action
+- "Help" - Show available commands
+- "Yes" / "Confirm" - Confirm an action
+
+### Command Chaining
 You can chain multiple commands:
 - "Go to gmail and then compose email"
 - "Search for news then scroll down"
+- "Open twitter and post a tweet"
 
-## Programmatic Usage
+### Natural Language Queries
+The system also understands natural language:
+- "What's the weather in New York?"
+- "Find hotels in Paris under $100"
+- "Show me the latest tech news"
 
+## Examples
+
+### Basic Usage
 ```python
 import asyncio
 from langchain_openai import ChatOpenAI
@@ -113,6 +152,29 @@ async def main():
     await agent.run()
 
 asyncio.run(main())
+```
+
+### With Status Indicator
+```python
+from browser_use.voice import VoiceAgent, VoiceAgentConfig, VisualStatusIndicator
+
+# Create status indicator for visual feedback
+status = VisualStatusIndicator()
+
+config = VoiceAgentConfig(
+    on_command_start=lambda cmd: status.set_executing(cmd),
+    on_command_complete=lambda cmd, success: status.set_success() if success else status.set_error(),
+    on_listening_state_change=lambda listening: status.set_listening() if listening else status.set_idle(),
+)
+
+agent = VoiceAgent(llm=llm, config=config)
+```
+
+### Single Command Execution
+```python
+# Execute a single command programmatically
+result = await agent.execute_single_command("search for Python tutorials")
+print(f"Success: {result['success']}, Result: {result['result']}")
 ```
 
 ## Configuration Options
@@ -141,6 +203,11 @@ VoiceAgentConfig(
     # Continuous mode
     continuous_mode=True,
     auto_start_listening=True,
+    
+    # Callbacks
+    on_command_start=lambda cmd: print(f"Starting: {cmd}"),
+    on_command_complete=lambda cmd, success: print(f"Done: {success}"),
+    on_listening_state_change=lambda listening: print("Listening..." if listening else "Idle"),
 )
 ```
 
@@ -172,4 +239,22 @@ pip install pyaudio
 On Linux:
 ```bash
 sudo apt-get install portaudio19-dev python3-pyaudio
+```
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    VoiceAgent                               │
+├─────────────────────────────────────────────────────────────┤
+│  ┌───────────────┐  ┌───────────────┐  ┌────────────────┐  │
+│  │ Speech        │  │ Command       │  │ Voice          │  │
+│  │ Recognizer    │──│ Parser        │──│ Feedback       │  │
+│  └───────────────┘  └───────────────┘  └────────────────┘  │
+│          │                  │                   │           │
+│  ┌───────────────┐  ┌───────────────┐  ┌────────────────┐  │
+│  │ Interrupt     │  │ Visual        │  │ Browser-use    │  │
+│  │ Handler       │  │ Status        │  │ Agent          │  │
+│  └───────────────┘  └───────────────┘  └────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
 ```

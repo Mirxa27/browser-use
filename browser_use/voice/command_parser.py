@@ -36,16 +36,34 @@ class CommandType(Enum):
 	TYPE = 'type'
 	FILL_FORM = 'fill_form'
 
+	# Content extraction
+	READ_PAGE = 'read_page'
+	SCREENSHOT = 'screenshot'
+	SAVE_PDF = 'save_pdf'
+	EXTRACT_TEXT = 'extract_text'
+
 	# Browser controls
 	BOOKMARK = 'bookmark'
 	OPEN_BOOKMARKS = 'open_bookmarks'
 	OPEN_HISTORY = 'open_history'
 	OPEN_SETTINGS = 'open_settings'
+	ZOOM_IN = 'zoom_in'
+	ZOOM_OUT = 'zoom_out'
+	FULLSCREEN = 'fullscreen'
 
 	# Email actions
 	COMPOSE_EMAIL = 'compose_email'
 	REPLY_EMAIL = 'reply_email'
 	SEND_EMAIL = 'send_email'
+
+	# Social media actions
+	POST_TWEET = 'post_tweet'
+	LIKE_POST = 'like_post'
+	SHARE_POST = 'share_post'
+
+	# Shopping actions
+	ADD_TO_CART = 'add_to_cart'
+	CHECKOUT = 'checkout'
 
 	# General actions
 	STOP = 'stop'
@@ -53,6 +71,8 @@ class CommandType(Enum):
 	HELP = 'help'
 	REPEAT = 'repeat'
 	CONFIRM = 'confirm'
+	UNDO = 'undo'
+	WAIT = 'wait'
 
 	# Custom/LLM-handled
 	CUSTOM = 'custom'
@@ -155,6 +175,28 @@ class CommandParser:
 			r'fill\s+(?:out\s+)?(?:the\s+)?form',
 			r'complete\s+(?:the\s+)?form',
 		],
+		# Content extraction patterns
+		CommandType.READ_PAGE: [
+			r'read\s+(?:this\s+)?page',
+			r'read\s+(?:the\s+)?content',
+			r'what\s+does\s+(?:this\s+)?(?:page|site)\s+say',
+			r'summarize\s+(?:this\s+)?page',
+		],
+		CommandType.SCREENSHOT: [
+			r'(?:take\s+)?(?:a\s+)?screenshot',
+			r'capture\s+(?:the\s+)?screen',
+			r'save\s+(?:a\s+)?screenshot',
+		],
+		CommandType.SAVE_PDF: [
+			r'save\s+(?:as\s+)?pdf',
+			r'export\s+(?:to\s+)?pdf',
+			r'print\s+(?:to\s+)?pdf',
+		],
+		CommandType.EXTRACT_TEXT: [
+			r'extract\s+(?:the\s+)?text',
+			r'copy\s+(?:all\s+)?text',
+			r'get\s+(?:the\s+)?text',
+		],
 		# Browser control patterns
 		CommandType.BOOKMARK: [
 			r'bookmark\s+(?:this\s+)?page',
@@ -176,6 +218,21 @@ class CommandParser:
 			r'browser settings',
 			r'preferences',
 		],
+		CommandType.ZOOM_IN: [
+			r'zoom\s+in',
+			r'make\s+(?:it\s+)?bigger',
+			r'increase\s+(?:the\s+)?size',
+		],
+		CommandType.ZOOM_OUT: [
+			r'zoom\s+out',
+			r'make\s+(?:it\s+)?smaller',
+			r'decrease\s+(?:the\s+)?size',
+		],
+		CommandType.FULLSCREEN: [
+			r'(?:go\s+)?fullscreen',
+			r'full\s+screen',
+			r'maximize',
+		],
 		# Email patterns
 		CommandType.COMPOSE_EMAIL: [
 			r'(?:compose|write|create)\s+(?:an?\s+)?email(?:\s+to\s+(.+))?',
@@ -192,12 +249,48 @@ class CommandParser:
 			r'send\s+it',
 			r'send\s+(?:the\s+)?message',
 		],
+		# Social media patterns
+		CommandType.POST_TWEET: [
+			r'(?:post|write|create)\s+(?:a\s+)?tweet(?:\s+saying\s+(.+))?',
+			r'tweet\s+(.+)',
+		],
+		CommandType.LIKE_POST: [
+			r'like\s+(?:this\s+)?(?:post|tweet|photo)',
+			r'(?:give\s+)?(?:a\s+)?like',
+			r'heart\s+(?:this|it)',
+		],
+		CommandType.SHARE_POST: [
+			r'share\s+(?:this\s+)?(?:post|tweet|article)',
+			r'retweet\s+(?:this)?',
+			r'repost\s+(?:this)?',
+		],
+		# Shopping patterns
+		CommandType.ADD_TO_CART: [
+			r'add\s+(?:this\s+)?(?:to\s+)?(?:the\s+)?cart',
+			r'add\s+to\s+cart',
+			r'(?:put|add)\s+(?:it\s+)?in\s+(?:my\s+)?cart',
+		],
+		CommandType.CHECKOUT: [
+			r'(?:go\s+to\s+)?checkout',
+			r'proceed\s+to\s+checkout',
+			r'buy\s+(?:now|this)',
+			r'complete\s+(?:the\s+)?purchase',
+		],
 		# Control patterns
 		CommandType.STOP: [
-			r'stop',
-			r'halt',
-			r'pause',
-			r'wait',
+			r'stop$',
+			r'halt$',
+			r'pause$',
+		],
+		CommandType.WAIT: [
+			r'wait$',
+			r'hold\s+on',
+			r'wait\s+(?:for\s+)?(\d+)\s*(?:seconds?)?$',
+		],
+		CommandType.UNDO: [
+			r'undo',
+			r'go\s+back\s+one\s+step',
+			r'revert',
 		],
 		CommandType.CANCEL: [
 			r'cancel',
@@ -251,6 +344,8 @@ class CommandParser:
 	DESTRUCTIVE_COMMANDS = {
 		CommandType.CLOSE_TAB,
 		CommandType.SEND_EMAIL,
+		CommandType.CHECKOUT,
+		CommandType.POST_TWEET,
 	}
 
 	# Priority order for command matching (more specific patterns first)
@@ -280,11 +375,28 @@ class CommandParser:
 		CommandType.COMPOSE_EMAIL,
 		CommandType.REPLY_EMAIL,
 		CommandType.SEND_EMAIL,
+		# Content extraction
+		CommandType.SCREENSHOT,
+		CommandType.SAVE_PDF,
+		CommandType.READ_PAGE,
+		CommandType.EXTRACT_TEXT,
+		# Social media
+		CommandType.POST_TWEET,
+		CommandType.LIKE_POST,
+		CommandType.SHARE_POST,
+		# Shopping
+		CommandType.ADD_TO_CART,
+		CommandType.CHECKOUT,
 		# Browser controls
 		CommandType.BOOKMARK,
 		CommandType.OPEN_BOOKMARKS,
 		CommandType.OPEN_HISTORY,
 		CommandType.OPEN_SETTINGS,
+		CommandType.ZOOM_IN,
+		CommandType.ZOOM_OUT,
+		CommandType.FULLSCREEN,
+		CommandType.WAIT,
+		CommandType.UNDO,
 		# Generic navigation last (catches "open [anything]")
 		CommandType.NAVIGATE,
 	]
@@ -473,14 +585,32 @@ Available Voice Commands:
   • "Scroll down/up" - Scroll the page
   • "Click on [element]" - Click an element
   • "Type [text]" - Enter text
+  • "Zoom in" / "Zoom out" - Adjust page zoom
+
+📄 Content:
+  • "Take screenshot" - Capture the page
+  • "Save as PDF" - Export page to PDF
+  • "Read page" - Summarize page content
+  • "Extract text" - Get all text from page
 
 📧 Email:
   • "Compose email to [recipient]" - Start new email
   • "Reply to email" - Reply to current email
   • "Send email" - Send the email
 
+📱 Social Media:
+  • "Post tweet [content]" - Create a tweet
+  • "Like post" - Like current post
+  • "Share post" - Share/retweet
+
+🛒 Shopping:
+  • "Add to cart" - Add item to cart
+  • "Checkout" - Proceed to checkout
+
 🎤 Control:
   • "Stop" / "Cancel" - Stop current action
+  • "Wait [seconds]" - Pause for a moment
+  • "Undo" - Undo last action
   • "Help" - Show available commands
   • "Yes" / "Confirm" - Confirm an action
 
@@ -560,6 +690,52 @@ Available Voice Commands:
 
 		elif command.command_type == CommandType.BOOKMARK:
 			return 'Bookmark this page'
+
+		elif command.command_type == CommandType.SCREENSHOT:
+			return 'Take a screenshot of the current page'
+
+		elif command.command_type == CommandType.SAVE_PDF:
+			return 'Save this page as a PDF'
+
+		elif command.command_type == CommandType.READ_PAGE:
+			return 'Read and summarize the content of this page'
+
+		elif command.command_type == CommandType.EXTRACT_TEXT:
+			return 'Extract all text from this page'
+
+		elif command.command_type == CommandType.ZOOM_IN:
+			return 'Zoom in on the page'
+
+		elif command.command_type == CommandType.ZOOM_OUT:
+			return 'Zoom out on the page'
+
+		elif command.command_type == CommandType.FULLSCREEN:
+			return 'Enter fullscreen mode'
+
+		elif command.command_type == CommandType.POST_TWEET:
+			content = command.parameters.get('content', '')
+			if content:
+				return f'Post a tweet saying: "{content}"'
+			return 'Create a new tweet'
+
+		elif command.command_type == CommandType.LIKE_POST:
+			return 'Like the current post'
+
+		elif command.command_type == CommandType.SHARE_POST:
+			return 'Share or retweet the current post'
+
+		elif command.command_type == CommandType.ADD_TO_CART:
+			return 'Add this item to the shopping cart'
+
+		elif command.command_type == CommandType.CHECKOUT:
+			return 'Proceed to checkout'
+
+		elif command.command_type == CommandType.WAIT:
+			seconds = command.parameters.get('seconds', 3)
+			return f'Wait for {seconds} seconds'
+
+		elif command.command_type == CommandType.UNDO:
+			return 'Undo the last action'
 
 		elif command.command_type == CommandType.CUSTOM:
 			task = command.parameters.get('task', command.raw_text)
