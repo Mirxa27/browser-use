@@ -201,22 +201,46 @@ If you use Browser Use in your research or project, please cite:
 Made with ❤️ in Zurich and San Francisco
  </div>
 
-# Development Workflow
+## Deploying on Netlify by the name of Mirxa
 
-## Branches
-- **`stable`**: Mirrors the latest stable release. This branch is updated only when a new stable release is published (every few weeks).
-- **`main`**: The primary development branch. This branch is updated frequently (every hour or more).
+To deploy this project on Netlify by the name of Mirxa, follow these steps:
 
-## Tags
-- **`x.x.x`**: Stable release tags. These are created for stable releases and updated every few weeks.
+1. **Create a Netlify account**: If you don't have a Netlify account, sign up at [Netlify](https://www.netlify.com/).
 
-## Workflow Summary
-1. **Push to `main`**:
-   - Runs pre-commit hooks to fix formatting.
-   - Executes tests to ensure code quality.
+2. **Install Netlify CLI**: Install the Netlify CLI globally on your machine.
 
-2. **Release a new version**:
-   - If the tag is a stable release (`x.x.x`), the package is pushed to PyPI as a stable release, and the `stable` branch is updated to match the release.
+   ```bash
+   npm install -g netlify-cli
+   ```
 
-3. **Scheduled Pre-Releases**:
-   - Every Friday at 5 PM UTC, a new pre-release tag (`x.x.xrcXX`) is created from the `main` branch and pushed to the repository.
+3. **Login to Netlify**: Login to your Netlify account using the CLI.
+
+   ```bash
+   netlify login
+   ```
+
+4. **Initialize a new site**: Initialize a new site in the current directory.
+
+   ```bash
+   netlify init
+   ```
+
+5. **Deploy the site**: Deploy the site to Netlify.
+
+   ```bash
+   netlify deploy --prod
+   ```
+
+### Setting up the `NETLIFY_AUTH_TOKEN` environment variable
+
+To authenticate with Netlify, you need to set up the `NETLIFY_AUTH_TOKEN` environment variable. Follow these steps:
+
+1. **Generate a personal access token**: Go to your Netlify account settings and generate a new personal access token.
+
+2. **Add the token to your environment variables**: Add the generated token to your environment variables.
+
+   ```bash
+   export NETLIFY_AUTH_TOKEN=your_generated_token
+   ```
+
+For more detailed instructions, refer to the [Netlify documentation](https://docs.netlify.com/).
