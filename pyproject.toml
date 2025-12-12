@@ -1,8 +1,8 @@
 [project]
 name = "browser-use"
-description = "Make websites accessible for AI agents"
-authors = [{ name = "Gregor Zunic" }]
-version = "0.1.40"
+description = "Enable AI to control your browser"
+authors = [{ name = "Your Name <you@example.com>" }]
+version = "0.1.0"
 readme = "README.md"
 requires-python = ">=3.11,<4.0"
 classifiers = [
@@ -34,6 +34,13 @@ dependencies = [
     "psutil>=7.0.0",
     "faiss-cpu>=1.10.0",
     "mem0ai==0.1.81",
+]
+
+# Optional voice control dependencies - install with: pip install browser-use[voice]
+[project.optional-dependencies]
+voice = [
+    "SpeechRecognition>=3.10.0",
+    "pyttsx3>=2.90",
 ]
 
 # botocore: only needed for Bedrock Claude boto3 examples/models/bedrock_claude.py 
@@ -92,5 +99,6 @@ dev-dependencies = [
     "ipdb>=0.13.13",
     "pre-commit>=4.2.0",
     "codespell>=2.4.1",
+    "pytest>=6.2.4",
 ]
 [tool.poetry]\nname = "browser-use"\nversion = "0.1.0"\ndescription = "Enable AI to control your browser"\nauthors = ["Your Name <you@example.com>"]\n\n[tool.poetry.dependencies]\npython = "^3.11"\n\n[tool.poetry.dev-dependencies]\npytest = "^6.2.4"
