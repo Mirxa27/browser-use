@@ -35,6 +35,18 @@ brew install portaudio
 pip install pyaudio
 ```
 
+#### 🖥️ macOS One-Click App
+
+For the easiest macOS experience, use our one-click startup app:
+
+```bash
+cd examples/voice/macos_app
+./create_app.sh
+```
+
+This creates a `Voice Browser.app` that you can double-click to launch!
+See [macos_app/README.md](macos_app/README.md) for details.
+
 ### Linux (Ubuntu/Debian)
 ```bash
 sudo apt-get install python3-pyaudio portaudio19-dev espeak
