@@ -36,6 +36,13 @@ dependencies = [
     "mem0ai==0.1.81",
 ]
 
+# Optional voice control dependencies - install with: pip install browser-use[voice]
+[project.optional-dependencies]
+voice = [
+    "SpeechRecognition>=3.10.0",
+    "pyttsx3>=2.90",
+]
+
 # botocore: only needed for Bedrock Claude boto3 examples/models/bedrock_claude.py 
 # pydantic: >2.11 introduces many pydantic deprecation warnings until langchain-core upgrades their pydantic support lets keep it on 2.10
 # google-api-core: only used for Google LLM APIs
